@@ -93,9 +93,7 @@ public class LdesTriplestoreMaterialisation extends AbstractProcessor {
 				session.read(flowFile, new InputStreamCallback() {
 					@Override
 					public void process(InputStream in) throws IOException {
-						String LDESMemberRDF = IOUtils.toString(in);
-						InputStream targetStream = IOUtils.toInputStream(LDESMemberRDF);
-						Model updateModel = Rio.parse(targetStream, "", RDFFormat.NQUADS);
+Model updateModel = Rio.parse(in, "", RDFFormat.NQUADS);
 
 						Set<Resource> entityIds = getSubjectsFromModel(updateModel);
 
