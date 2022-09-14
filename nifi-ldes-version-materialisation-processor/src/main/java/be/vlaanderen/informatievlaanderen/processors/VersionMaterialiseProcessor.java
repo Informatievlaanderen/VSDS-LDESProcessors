@@ -120,9 +120,7 @@ public class VersionMaterialiseProcessor extends AbstractProcessor {
             @Override
             public void process(InputStream in) throws IOException {
                 try {
-                    String FragmentRDF = IOUtils.toString(in);
-                    InputStream targetStream = IOUtils.toInputStream(FragmentRDF);
-                    Model inputModel = Rio.parse(targetStream, "", RDFFormat.NQUADS);
+                    Model inputModel = Rio.parse(in, "", RDFFormat.NQUADS);
 
                     Model versionMaterialisedModel = versionMaterialise(inputModel, isVersionOf);
                     if (RESTRICT_TO_MEMBERS)
