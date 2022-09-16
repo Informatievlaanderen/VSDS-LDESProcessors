@@ -6,7 +6,7 @@
 
     <groupId>be.vlaanderen.informatievlaanderen</groupId>
     <artifactId>nifi-ldes-geo-projection-processors</artifactId>
-    <version>0.0-SNAPSHOT-${maven.build.timestamp}</version>
+    <version>0.1-SNAPSHOT</version>
 
     <packaging>nar</packaging>
     <properties>
@@ -115,7 +115,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/nifi-extensions</outputDirectory>
+				<outputDirectory>${basedir}/../nifi-extensions</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${basedir}/target/</directory>

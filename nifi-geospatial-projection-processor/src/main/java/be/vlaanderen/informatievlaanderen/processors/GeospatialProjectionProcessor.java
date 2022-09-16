@@ -30,14 +30,8 @@ import org.apache.nifi.processor.util.StandardValidators;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.util.Models;
-import org.eclipse.rdf4j.query.GraphQuery;
-import org.eclipse.rdf4j.repository.Repository;
-import org.eclipse.rdf4j.repository.RepositoryConnection;
-import org.eclipse.rdf4j.repository.sail.SailRepository;
 import org.eclipse.rdf4j.rio.RDFFormat;
-import org.eclipse.rdf4j.rio.RDFHandler;
 import org.eclipse.rdf4j.rio.Rio;
-import org.eclipse.rdf4j.sail.memory.MemoryStore;
 import org.json.simple.JSONObject;
 
 import java.io.*;
@@ -61,10 +55,17 @@ public class GeospatialProjectionProcessor extends AbstractProcessor {
             .Builder().name("TARGET_CRS")
             .displayName("Target CRS")
             .required(true)
-            .defaultValue("WGS84")
+            .defaultValue("EPSG:4326 ")
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
+    public static final PropertyDescriptor CONVERSION_SERVICE = new PropertyDescriptor
+            .Builder().name("CONVERSION_SERVICE")
+            .displayName("URL of the conversion service")
+            .required(true)
+            .defaultValue("http://gdal:8090/")
+            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
+            .build();
     public static final Relationship REL_SUCCESS = new Relationship.Builder()
             .name("SUCCESS")
             .description("Success relationship")
@@ -83,6 +84,7 @@ public class GeospatialProjectionProcessor extends AbstractProcessor {
     protected void init(final ProcessorInitializationContext context) {
         descriptors = new ArrayList<>();
         descriptors.add(TARGET_CRS);
+        descriptors.add(CONVERSION_SERVICE);
         descriptors = Collections.unmodifiableList(descriptors);
 
         relationships = new HashSet<>();
@@ -105,33 +107,30 @@ public class GeospatialProjectionProcessor extends AbstractProcessor {
     public void onTrigger(final ProcessContext context, final ProcessSession session) {
         FlowFile flowFile = session.get();
         String CRS_To = context.getProperty(TARGET_CRS).getValue();
+        String CONVERSION_SERVICE_URL = context.getProperty(CONVERSION_SERVICE).getValue();
 
         if ( flowFile == null ) {
             return;
         }
         StringWriter outputStream = new StringWriter();
         AtomicBoolean executedSuccessfully = new AtomicBoolean(false);
-        AtomicBoolean hasChange = new AtomicBoolean(false);
         session.read(flowFile, new InputStreamCallback() {
             @Override
             public void process(InputStream RDFStream) throws IOException {
                 try{
                     Model inputModel = Rio.parse(RDFStream, "", RDFFormat.NQUADS);
-                    Model transformedModel = geoTransform(inputModel, CRS_To);
-                    if (!Models.isomorphic(inputModel, transformedModel)) {
-                        hasChange.set(true);
-                        Rio.write(inputModel, outputStream, RDFFormat.NQUADS);
-                    }
+                    Model transformedModel = geoTransform(inputModel, CONVERSION_SERVICE_URL, CRS_To);
+                    Rio.write(inputModel, outputStream, RDFFormat.NQUADS);
                     executedSuccessfully.set(true);
                 }
                 catch (Exception e) {
                     getLogger().error("Error executing geo projection.");
+                    throw new RuntimeException(e);
                 }
             }
         });
         if (executedSuccessfully.get()) {
-            if (hasChange.get())
-                flowFile = session.write(flowFile, out -> out.write(outputStream.toString().getBytes()));
+            flowFile = session.write(flowFile, out -> out.write(outputStream.toString().getBytes()));
             session.transfer(flowFile, REL_SUCCESS);
         }
         else {
@@ -139,8 +138,8 @@ public class GeospatialProjectionProcessor extends AbstractProcessor {
         }
     }
 
-    public static Model geoTransform(Model inputModel, String CRS_To) throws MalformedURLException {
-        final URL host = new URL("http://localhost:8090/");
+    public static Model geoTransform(Model inputModel, String CONVERSION_SERVICE_URL, String CRS_To) throws MalformedURLException {
+        final URL host = new URL(CONVERSION_SERVICE_URL);
 
         inputModel.getStatements(null, null,null).forEach( statement -> {
             if (!statement.getObject().isLiteral())
