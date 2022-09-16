@@ -8,8 +8,6 @@
     <artifactId>nifi-rdf4j-repository-put-processor</artifactId>
     <version>0.1-SNAPSHOT</version>
 
-
-
     <packaging>nar</packaging>
 
     <properties>
@@ -71,7 +69,6 @@
             <version>2.33.2</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <dependencyManagement>
@@ -85,7 +82,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
 
     <build>
         <plugins>

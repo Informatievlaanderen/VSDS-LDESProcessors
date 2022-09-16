@@ -30,10 +30,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.nifi.processor.util.StandardValidators;
 
-@Tags({ "ldes-triplestore, vsds" })
-@CapabilityDescription("Materialises LDES events in a triplestore (SPARQL query)")
+@Tags({ "ldes, rdf4j-repository, vsds" })
+@CapabilityDescription("Materialises LDES events into an RDF4J repository")
 @InputRequirement(InputRequirement.Requirement.INPUT_REQUIRED)
-public class LdesTriplestoreMaterialisation extends AbstractProcessor {
+public class RDF4JRepositoryMaterialisation extends AbstractProcessor {
 	private RepositoryManager repositoryManager;
 
 	static final Relationship REL_SUCCESS = new Relationship.Builder()
@@ -47,8 +47,8 @@ public class LdesTriplestoreMaterialisation extends AbstractProcessor {
 			.build();
 
 	static final PropertyDescriptor SPARQL_HOST = new PropertyDescriptor.Builder()
-			.name("SPARQL host")
-			.description("The hostname and port of the SPARQL server.")
+			.name("REF4J remote repository location")
+			.description("The hostname and port of the server.")
 			.defaultValue("http://graphdb:7200")
 			.required(true)
 			.addValidator(StandardValidators.URL_VALIDATOR)
@@ -93,7 +93,7 @@ public class LdesTriplestoreMaterialisation extends AbstractProcessor {
 				session.read(flowFile, new InputStreamCallback() {
 					@Override
 					public void process(InputStream in) throws IOException {
-Model updateModel = Rio.parse(in, "", RDFFormat.NQUADS);
+						Model updateModel = Rio.parse(in, "", RDFFormat.NQUADS);
 
 						Set<Resource> entityIds = getSubjectsFromModel(updateModel);
 
