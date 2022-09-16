@@ -1,6 +1,6 @@
 # Apache NiFi LDES version materialisation processor
 
-This processor turns a versioned LDES stream into an unversion LDES stream.
+This processor turns a versioned LDES stream into an unversioned LDES stream.
 
 # Build the NAR file (Jar for NiFi)
 ```
