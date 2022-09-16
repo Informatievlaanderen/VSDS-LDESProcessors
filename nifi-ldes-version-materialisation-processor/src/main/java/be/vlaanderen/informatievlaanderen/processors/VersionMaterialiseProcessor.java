@@ -67,7 +67,6 @@ public class VersionMaterialiseProcessor extends AbstractProcessor {
             .addValidator(StandardValidators.BOOLEAN_VALIDATOR)
             .build();
 
-
     public static final Relationship REL_SUCCESS = new Relationship.Builder()
             .name("Success")
             .description("Success relationship")

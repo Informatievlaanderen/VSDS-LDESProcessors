@@ -112,7 +112,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/nifi-extensions</outputDirectory>
+				<outputDirectory>${basedir}/../nifi-extensions</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${basedir}/target/</directory>
