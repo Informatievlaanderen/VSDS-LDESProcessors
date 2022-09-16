@@ -35,17 +35,11 @@ public class GeospatialProjectionProcessorTest {
         testRunner = TestRunners.newTestRunner(GeospatialProjectionProcessor.class);
     }
 
-
     /**
-     * Assert that a SPARQL Construct processor can manipulate a FlowFile.
+     * Test the geospatial re-projection processor.
      */
     @Test
     public void testSparqlConstructInferenceMode() {
         //final TestRunner testRunner = TestRunners.newTestRunner(new GeospatialProjectionProcessor());
-
-
     }
-
-
-
 }
