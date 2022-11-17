@@ -23,23 +23,24 @@ import com.github.jsonldjava.core.JsonLdOptions;
 
 
 public class RDF2JSONLD {
-    public static String modelToJSONLD(Model model, Map<String, Object> frame, Resource member ) {
+    public static String modelToJSONLD(Model model, Map<String, Object> frame, Resource member ) throws IOException {
         String RDF4JJSONLD = modelToRDF4JJSONLD(model);
-        try {
+
             Map<String, Object> framedJson = getFramedJson(createJsonObject(RDF4JJSONLD), frame);
             return filterMember(framedJson, member);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+
     }
 
     private static String filterMember(Map<String, Object> framedJson, Resource member) throws IOException {
         List<Map<String,Object>>  graph = (List<Map<String, Object>>) framedJson.get("@graph");
         AtomicReference<String> JSON = new AtomicReference<>(JsonUtils.toPrettyString(graph));
                 graph.forEach(object -> {
-            String ID = (String) object.get("id");
+            String ID = "http://not-defined/";
+            if (object.containsKey("id"))
+                        ID = (String) object.get("id");
+            if (object.containsKey("@id"))
+                ID = (String) object.get("@id");
             if (ID.contentEquals(member.toString())) {
-
                 try {
                     JSON.set(JsonUtils.toPrettyString(object));
                 } catch (IOException e) {
