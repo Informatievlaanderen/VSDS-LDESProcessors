@@ -55,7 +55,7 @@ public class GeospatialProjectionProcessor extends AbstractProcessor {
             .Builder().name("TARGET_CRS")
             .displayName("Target CRS")
             .required(true)
-            .defaultValue("EPSG:4326 ")
+            .defaultValue("http://www.opengis.net/def/crs/EPSG/0/4326") // WSG84
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
@@ -161,7 +161,13 @@ public class GeospatialProjectionProcessor extends AbstractProcessor {
             try {
                 String Geometry_to = doRequest(host, CRS_From, CRS_To, Geometry_from);
                 inputModel.remove(statement.getSubject(), statement.getPredicate(), object);
-                Literal new_object = vf.createLiteral("<" + CRS_To + "> " + Geometry_to, wktLiteral);
+                String geometry;
+                // According to spec WGS84 is implicit, CRS shouldn't be stated.
+                if (CRS_To.equals("http://www.opengis.net/def/crs/EPSG/0/4326"))
+                    geometry = Geometry_to;
+                else
+                    geometry = "<" + CRS_To + "> " + Geometry_to;
+                Literal new_object = vf.createLiteral(geometry, wktLiteral);
                 inputModel.add(vf.createStatement(statement.getSubject(), statement.getPredicate(), new_object));
             } catch (IOException e) {
                 throw new RuntimeException(e);
