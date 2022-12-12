@@ -36,15 +36,34 @@ public class SparqlSelectProcessorTest {
     }
 
     public final String SelectQuery = """
-        SELECT ?predicate ?object
-        WHERE { ?subject ?predicate ?object }
-        """;
+            SELECT ?x ?fname ?gname
+            WHERE {
+                ?x  <http://www.w3.org/2001/vcard-rdf/3.0#FN>  ?fname .
+                ?x  <http://www.w3.org/2001/vcard-rdf/3.0#N>/<http://www.w3.org/2001/vcard-rdf/3.0#Given> ?gname .
+            }
+            """;
 
     public final String FlowFileContents = """
-        <http://data-in-flowfile/> <http://test/> "OBJ1" .
-        <http://data-in-flowfile/> <http://test/2> "OBJ2" .
-        <http://data-in-flowfile/> <http://test/2> "OBJ3" .
-        """;
+            <http://somewhere/MattJones/> <http://www.w3.org/2001/vcard-rdf/3.0#FN> "Matt Jones" .
+            <http://somewhere/MattJones/> <http://www.w3.org/2001/vcard-rdf/3.0#N> _:genid1 .
+            _:genid1 <http://www.w3.org/2001/vcard-rdf/3.0#Family> "Jones" .
+            _:genid1 <http://www.w3.org/2001/vcard-rdf/3.0#Given> "Matthew" .
+            
+            <http://somewhere/RebeccaSmith/> <http://www.w3.org/2001/vcard-rdf/3.0#FN> "Becky Smith" .
+            <http://somewhere/RebeccaSmith/> <http://www.w3.org/2001/vcard-rdf/3.0#N> _:genid2 .
+            _:genid2 <http://www.w3.org/2001/vcard-rdf/3.0#Family> "Smith" .
+            _:genid2 <http://www.w3.org/2001/vcard-rdf/3.0#Given> "Rebecca" .
+            
+            <http://somewhere/JohnSmith/> <http://www.w3.org/2001/vcard-rdf/3.0#FN> "John Smith" .
+            <http://somewhere/JohnSmith/> <http://www.w3.org/2001/vcard-rdf/3.0#N> _:genid3 .
+            _:genid3 <http://www.w3.org/2001/vcard-rdf/3.0#Family> "Smith" .
+            _:genid3 <http://www.w3.org/2001/vcard-rdf/3.0#Given> "John" .
+            
+            <http://somewhere/SarahJones/> <http://www.w3.org/2001/vcard-rdf/3.0#FN> "Sarah Jones" .
+            <http://somewhere/SarahJones/> <http://www.w3.org/2001/vcard-rdf/3.0#N> _:genid4 .
+            _:genid4 <http://www.w3.org/2001/vcard-rdf/3.0#Family> "Jones" .
+            _:genid4 <http://www.w3.org/2001/vcard-rdf/3.0#Given> "Sarah" .
+            """;
 
     /**
      * Assert that a SPARQL Construct processor can manipulate a FlowFile.
@@ -60,7 +79,8 @@ public class SparqlSelectProcessorTest {
         testRunner.run();
 
         MockFlowFile f = testRunner.getFlowFilesForRelationship(SparqlSelectProcessor.SUCCESS).get(0);
-        assert f.getContent().equals("[{\"predicate\":\"http://test/\",\"object\":\"OBJ1\"},{\"predicate\":\"http://test/2\",\"object\":\"OBJ2\"},{\"predicate\":\"http://test/2\",\"object\":\"OBJ3\"}]");
+        System.out.print(f.getContent());
+        assert f.getContent().equals("[{\"x\":\"http://somewhere/MattJones/\",\"fname\":\"Matt Jones\",\"gname\":\"Matthew\"},{\"x\":\"http://somewhere/RebeccaSmith/\",\"fname\":\"Becky Smith\",\"gname\":\"Rebecca\"},{\"x\":\"http://somewhere/JohnSmith/\",\"fname\":\"John Smith\",\"gname\":\"John\"},{\"x\":\"http://somewhere/SarahJones/\",\"fname\":\"Sarah Jones\",\"gname\":\"Sarah\"}]");
 
     }
 
