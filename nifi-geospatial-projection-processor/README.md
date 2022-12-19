@@ -16,7 +16,7 @@ The NAR file is copied to the 'nifi-extentions' folder, in the root of the repos
 Either copy the NAR file to the NiFi extentions folder or bind-mount the 'nifi-extentions' folder in docker-compose.yml.
 
 ## Run
-This processor depends on an external serice to perform the convertion. Build the gdal image in the gdal-docker folder and run it.
+This processor depends on an external service to perform the conversion. Build the gdal image in the gdal-docker folder and run it.
 ```
 docker build gdal-docker -t gdal-service
 docker run -p 8090:8090 gdal-service

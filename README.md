@@ -1,6 +1,6 @@
 # VSDS NiFi processors
 
-One of the cornerstones on which the 'Smart Data Space Flanders' (~Vlaamse Sensor Data Space, VSDS) is build is the[Linked Data Event Stream (LDES)](https://w3id.org/ldes/specification) specification.
+One of the cornerstones on which the 'Smart Data Space Flanders' (~Vlaamse Smart Data Space, VSDS) is built, is the[Linked Data Event Stream (LDES)](https://w3id.org/ldes/specification) specification.
 LDES allows data consumers to subscribe to a stream of data, and stay in sync with changes in near real-time.
 
 
